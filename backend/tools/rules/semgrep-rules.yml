@@ -1,0 +1,165 @@
+# SentinelForge offline Semgrep rules — injection, unsafe APIs, auth mistakes,
+# secrets, file handling. Conservative patterns to limit false positives.
+rules:
+  - id: sf-command-injection-node
+    message: Potential command injection — user-controlled data flows into a shell command.
+    severity: HIGH
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: exec($ARG)
+          - pattern: execSync($ARG)
+          - pattern: spawn($ARG, {shell: true})
+          - pattern: execFile($ARG, ..., {shell: true})
+      - pattern-either:
+          - pattern: "... $X ..."
+          - pattern: '`...${$X}...`'
+      - metavariable-regex:
+          metavariable: $ARG
+          regex: "(?i)(req\\.|query|params|body|headers)"
+    fix: Use parameterized APIs and validate/whitelist inputs instead of building shell strings.
+
+  - id: sf-command-injection-python
+    message: Potential command injection — user input passed to a shell command.
+    severity: HIGH
+    languages: [python]
+    patterns:
+      - pattern-either:
+          - pattern: os.system(...)
+          - pattern: os.popen(...)
+          - pattern: subprocess.call(..., shell=True)
+          - pattern: subprocess.Popen(..., shell=True)
+          - pattern: subprocess.run(..., shell=True)
+      - pattern-either:
+          - pattern: "...$X..."
+          - pattern: f"...{$X}..."
+      - metavariable-regex:
+          metavariable: $X
+          regex: "(?i)(request\\.|args|form|json|data)"
+    fix: Use subprocess with shell=False and pass arguments as a list.
+
+  - id: sf-unsafe-eval
+    message: Unsafe dynamic evaluation (eval/exec) detected.
+    severity: HIGH
+    languages: [javascript, typescript, python]
+    patterns:
+      - pattern-either:
+          - pattern: eval($ARG)
+          - pattern: Function($ARG)
+          - pattern: exec($ARG)
+          - pattern: compile($ARG, ...)
+      - metavariable-regex:
+          metavariable: $ARG
+          regex: "(?i)(req\\.|query|params|body|headers|request\\.|input)"
+    fix: Avoid eval with user input; use safe parsers.
+
+  - id: sf-sqli-node
+    message: Possible SQL injection — string-built query with user input.
+    severity: HIGH
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: "$DB.query(...+ $X ...)"
+          - pattern: "$DB.query(`...${$X}...`)"
+          - pattern: "db.query(...+ $X ...)"
+          - pattern: "pool.query(...+ $X ...)"
+      - metavariable-regex:
+          metavariable: $X
+          regex: "(?i)(req\\.|query|params|body|headers)"
+    fix: Use parameterized queries with placeholders.
+
+  - id: sf-xss-innerhtml
+    message: Reflected XSS — user input assigned to innerHTML.
+    severity: HIGH
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: "$EL.innerHTML = $X"
+          - pattern: "document.write($X)"
+      - metavariable-regex:
+          metavariable: $X
+          regex: "(?i)(req\\.|query|params|body|headers|location\\.search|input)"
+    fix: Escape output or use textContent; adopt a CSP.
+
+  - id: sf-path-traversal-node
+    message: Potential path traversal — user input used in file paths without sanitization.
+    severity: HIGH
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: "fs.readFile(path.join($DIR, $X))"
+          - pattern: "fs.readFileSync(path.join($DIR, $X))"
+          - pattern: "fs.readFile($DIR + $X)"
+          - pattern: "fs.readFileSync($DIR + $X)"
+          - pattern: "sendFile($X)"
+      - metavariable-regex:
+          metavariable: $X
+          regex: "(?i)(req\\.|query|params|body|headers)"
+    fix: Resolve and verify the path stays inside an allowlisted root.
+
+  - id: sf-unsafe-yaml-python
+    message: Unsafe YAML load — yaml.load without a safe loader.
+    severity: HIGH
+    languages: [python]
+    patterns:
+      - pattern: yaml.load(...)
+      - pattern: pickle.loads(...)
+    fix: Use yaml.safe_load / avoid deserializing untrusted data.
+
+  - id: sf-debug-endpoint
+    message: Debug endpoint detected — may expose internals.
+    severity: MEDIUM
+    languages: [python]
+    patterns:
+      - pattern: '@app.get("/debug$X")'
+      - pattern: '@app.route("/debug$X")'
+      - pattern: "app.get('/debug$X')"
+    fix: Remove or gate debug endpoints behind environment checks.
+
+  - id: sf-hardcoded-secret
+    message: Possible hardcoded secret (key/password/token) in source.
+    severity: HIGH
+    languages: [javascript, typescript, python, go, java]
+    patterns:
+      - pattern-either:
+          - pattern: "const $K = \"$V\""
+          - pattern: "let $K = \"$V\""
+          - pattern: "var $K = \"$V\""
+          - pattern: "$K = \"$V\""
+      - metavariable-regex:
+          metavariable: $K
+          regex: "(?i)(api[_-]?key|secret|password|passwd|token|access[_-]?key)"
+      - metavariable-regex:
+          metavariable: $V
+          regex: ".{10,}"
+    fix: Move secrets to environment variables / a secrets manager.
+
+  - id: sf-unsafe-cors
+    message: Unsafe CORS configuration — wildcard origin with credentials.
+    severity: MEDIUM
+    languages: [javascript, typescript]
+    patterns:
+      - pattern: "setHeader('Access-Control-Allow-Origin', '*')"
+      - pattern: "setHeader(\"Access-Control-Allow-Origin\", \"*\")"
+      - pattern: "Access-Control-Allow-Origin: *"
+    fix: Restrict CORS origins to trusted domains.
+
+  - id: sf-template-injection
+    message: Possible template injection — user input rendered in a template engine.
+    severity: HIGH
+    languages: [python]
+    patterns:
+      - pattern: render_template_string(...)
+      - pattern: "Template($X).render(...)"
+    fix: Never render untrusted input as a template; escape properly.
+
+  - id: sf-insecure-cookie
+    message: Cookie set without Secure/HttpOnly flags.
+    severity: MEDIUM
+    languages: [javascript, typescript, python]
+    patterns:
+      - pattern-either:
+          - pattern: "setHeader('Set-Cookie', $X)"
+          - pattern: "res.cookie($NAME, $VALUE)"
+          - pattern: "make_response(...).set_cookie(...)"
+    fix: Set Secure, HttpOnly and SameSite attributes.

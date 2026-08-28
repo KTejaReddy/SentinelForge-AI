@@ -1,0 +1,74 @@
+{
+  "scan_id": 7,
+  "project": "vulnerable-app",
+  "overall_score": 76,
+  "security_score": 51,
+  "reliability_score": 96,
+  "code_health": 96,
+  "category_scores": {
+    "authentication": 100,
+    "authorization": 100,
+    "injection": 90,
+    "api_security": 100,
+    "secrets": 70,
+    "dependencies": 100,
+    "configuration": 93,
+    "file_security": 100,
+    "business_logic": 100,
+    "frontend_security": 100,
+    "reliability": 95,
+    "code_quality": 96
+  },
+  "findings_total": 12,
+  "critical": 2,
+  "high": 5,
+  "medium": 2,
+  "low": 2,
+  "confirmed": 2,
+  "fixed": 3,
+  "verified": 3,
+  "needs_review": 0,
+  "tools_executed": [
+    "semgrep",
+    "bandit",
+    "trivy",
+    "osv-scanner",
+    "gitleaks",
+    "native_tests",
+    "custom_probes",
+    "zap",
+    "browser",
+    "fuzz",
+    "patches",
+    "final_regression"
+  ],
+  "patches_generated": [
+    {
+      "finding": "Broken object-level authorization (IDOR/BOLA)",
+      "status": "applied",
+      "explanation": "The original `/api/account` and `/api/users/:id` endpoints allowed any caller to retrieve arbitrary user data because they lacked authentication and ownership checks, leading to IDOR/BOLA vulnerabilities. The patch adds session handling by extracting the `session` cookie, verifying it against the server\u2011side `sessions` map, and ensuring the requested user ID matches the authenticated user's ID. Unauthorized requests now receive 401, and attempts to access another user's data receive 403, eliminating the object\u2011level authorization flaw while preserving existing functionality for legitimate owners.",
+      "diff": "--- before/server.js\n+++ after/server.js\n@@ -52,10 +52,23 @@\n   res.json({ account: user });\n });\n \n-// GET /api/users/:id \u2014 BOLA/IDOR: no authentication or ownership check\n+// GET /api/users/:id \u2014 BOLA/IDOR: fixed with session ownership check\n app.get(\"/api/users/:id\", (req, res) => {\n-  // TODO: verify Authorization header and ownership\n+  // Extract session token from cookies\n+  const cookieHeader = req.headers.cookie || \"\";\n+  const tokenMatch = cookieHeader.match(/(?:^|; )session=([^;]+)/);\n+  const token = tokenMatch ? tokenMatch[1] : null;\n+  if (!token || !sessions.has(token)) {\n+    return res.status(401).json({ error: \"unauthenticated\" });\n+  }\n+  const requesterId = sessions.get(token);\n+\n   const id = Number(req.params.id);\n+  // Enforce ownership: only allow access to own user record\n+  if (id !== requesterId) {\n+    return res.status(403).json({ error: \"forbidden\" });\n+  }\n+\n   const user = db.users.find((u) => u.id === id);\n   if (!user) {\n     return res.status(404).json({ error: \"not found\" });",
+      "repair_tool": "AI_PATCH_FALLBACK"
+    }
+  ],
+  "regression_tests": [],
+  "coverage": {},
+  "limitations": [
+    "Trivy unavailable - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh",
+    "OSV-Scanner unavailable - https://github.com/google/osv-scanner/releases (official binaries) | scoop install osv-scanner",
+    "Gitleaks unavailable - used built-in regex secret scanner",
+    "OWASP ZAP unavailable - docker pull ghcr.io/zaproxy/zaproxy  (large image) - or the built-in Dynamic Probes analyzer covers passive checks",
+    "Root Cause Agent: rate limited (429)"
+  ],
+  "sandbox_mode": "local",
+  "attack_graph": [],
+  "ai": {
+    "calls": 5,
+    "cost_usd": 0.002929,
+    "tokens": {
+      "input": 5185,
+      "output": 3586
+    }
+  },
+  "generated_at": "2026-08-19T12:33:56.535802+00:00"
+}

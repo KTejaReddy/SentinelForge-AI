@@ -1,0 +1,65 @@
+{
+  "scan_id": 27,
+  "project": "Vulnerable Demo App (mixed)",
+  "overall_score": 71,
+  "security_score": 41,
+  "reliability_score": 96,
+  "code_health": 96,
+  "category_scores": {
+    "authentication": 100,
+    "authorization": 90,
+    "injection": 90,
+    "api_security": 100,
+    "secrets": 70,
+    "dependencies": 100,
+    "configuration": 93,
+    "file_security": 100,
+    "business_logic": 100,
+    "frontend_security": 100,
+    "reliability": 95,
+    "code_quality": 96
+  },
+  "findings_total": 12,
+  "critical": 2,
+  "high": 5,
+  "medium": 2,
+  "low": 2,
+  "confirmed": 2,
+  "fixed": 2,
+  "verified": 2,
+  "needs_review": 0,
+  "tools_executed": [
+    "semgrep",
+    "bandit",
+    "trivy",
+    "osv-scanner",
+    "gitleaks",
+    "native_tests",
+    "custom_probes",
+    "zap",
+    "browser",
+    "fuzz",
+    "final_regression"
+  ],
+  "patches_generated": [],
+  "regression_tests": [],
+  "coverage": {},
+  "limitations": [
+    "Trivy found no known vulnerabilities (DB may be stale or unreachable)",
+    "Gitleaks unavailable or produced no output - used built-in regex secret scanner",
+    "OWASP ZAP unavailable - docker pull ghcr.io/zaproxy/zaproxy  (large image) - or the built-in Dynamic Probes analyzer covers passive checks",
+    "Security Agent: rate limited (429)",
+    "Root Cause Agent: rate limited (429)"
+  ],
+  "sandbox_mode": "local",
+  "attack_graph": [],
+  "ai": {
+    "calls": 1,
+    "cost_usd": 0.00023,
+    "tokens": {
+      "input": 239,
+      "output": 324
+    }
+  },
+  "generated_at": "2026-08-18T16:48:52.736547+00:00"
+}

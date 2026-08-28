@@ -1,0 +1,65 @@
+{
+  "scan_id": 5,
+  "project": "injection-app",
+  "overall_score": 91,
+  "security_score": 80,
+  "reliability_score": 100,
+  "code_health": 100,
+  "category_scores": {
+    "authentication": 100,
+    "authorization": 100,
+    "injection": 100,
+    "api_security": 100,
+    "secrets": 80,
+    "dependencies": 100,
+    "configuration": 100,
+    "file_security": 100,
+    "business_logic": 100,
+    "frontend_security": 100,
+    "reliability": 100,
+    "code_quality": 100
+  },
+  "findings_total": 2,
+  "critical": 0,
+  "high": 2,
+  "medium": 0,
+  "low": 0,
+  "confirmed": 0,
+  "fixed": 0,
+  "verified": 0,
+  "needs_review": 0,
+  "tools_executed": [
+    "semgrep",
+    "bandit",
+    "trivy",
+    "osv-scanner",
+    "gitleaks",
+    "native_tests",
+    "final_regression"
+  ],
+  "patches_generated": [],
+  "regression_tests": [],
+  "coverage": {},
+  "limitations": [
+    "Application did not start; dynamic/browser/fuzz steps will be limited",
+    "Trivy unavailable - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh",
+    "OSV-Scanner unavailable - https://github.com/google/osv-scanner/releases (official binaries) | scoop install osv-scanner",
+    "Gitleaks unavailable - used built-in regex secret scanner",
+    "No project-native test command detected",
+    "Dynamic testing skipped (disabled or app not running)",
+    "Browser testing skipped (disabled or app not running)",
+    "Root Cause Agent: rate limited (429)",
+    "Auto-repair skipped: application not running, cannot reproduce"
+  ],
+  "sandbox_mode": "local",
+  "attack_graph": [],
+  "ai": {
+    "calls": 6,
+    "cost_usd": 0.001862,
+    "tokens": {
+      "input": 6745,
+      "output": 1418
+    }
+  },
+  "generated_at": "2026-08-19T12:29:51.689633+00:00"
+}

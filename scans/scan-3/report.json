@@ -1,0 +1,67 @@
+{
+  "scan_id": 3,
+  "project": "vulnerable-app",
+  "overall_score": 84,
+  "security_score": 71,
+  "reliability_score": 92,
+  "code_health": 96,
+  "category_scores": {
+    "authentication": 100,
+    "authorization": 90,
+    "injection": 90,
+    "api_security": 100,
+    "secrets": 100,
+    "dependencies": 100,
+    "configuration": 93,
+    "file_security": 100,
+    "business_logic": 100,
+    "frontend_security": 100,
+    "reliability": 90,
+    "code_quality": 96
+  },
+  "findings_total": 9,
+  "critical": 1,
+  "high": 2,
+  "medium": 3,
+  "low": 2,
+  "confirmed": 1,
+  "fixed": 1,
+  "verified": 1,
+  "needs_review": 0,
+  "tools_executed": [
+    "semgrep",
+    "bandit",
+    "trivy",
+    "osv-scanner",
+    "gitleaks",
+    "native_tests",
+    "custom_probes",
+    "zap",
+    "browser",
+    "fuzz",
+    "final_regression"
+  ],
+  "patches_generated": [],
+  "regression_tests": [],
+  "coverage": {},
+  "limitations": [
+    "Trivy found no known vulnerabilities (DB may be stale or unreachable)",
+    "Gitleaks unavailable or produced no output - used built-in regex secret scanner",
+    "Gitleaks failed: [WinError 1920] The file cannot be accessed by the system: 'T:\\\\SentinelForge AI\\\\workspaces\\\\scan-3\\\\working-copy\\\\node_modules\\\\.bin\\\\mime'",
+    "OWASP ZAP unavailable - docker pull ghcr.io/zaproxy/zaproxy  (large image) - or the built-in Dynamic Probes analyzer covers passive checks",
+    "Security Agent: rate limited (429)",
+    "Root Cause Agent: rate limited (429)",
+    "Repair Agent: rate limited (429)"
+  ],
+  "sandbox_mode": "docker",
+  "attack_graph": [],
+  "ai": {
+    "calls": 1,
+    "cost_usd": 0.000249,
+    "tokens": {
+      "input": 262,
+      "output": 349
+    }
+  },
+  "generated_at": "2026-08-19T14:47:28.914589+00:00"
+}

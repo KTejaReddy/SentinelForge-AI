@@ -1,0 +1,64 @@
+{
+  "scan_id": 4,
+  "project": "career-roadmap-main (1)",
+  "overall_score": 57,
+  "security_score": 5,
+  "reliability_score": 100,
+  "code_health": 100,
+  "category_scores": {
+    "authentication": 100,
+    "authorization": 100,
+    "injection": 100,
+    "api_security": 100,
+    "secrets": 80,
+    "dependencies": 5,
+    "configuration": 100,
+    "file_security": 100,
+    "business_logic": 100,
+    "frontend_security": 100,
+    "reliability": 100,
+    "code_quality": 100
+  },
+  "findings_total": 14,
+  "critical": 0,
+  "high": 10,
+  "medium": 4,
+  "low": 0,
+  "confirmed": 12,
+  "fixed": 0,
+  "verified": 0,
+  "needs_review": 0,
+  "tools_executed": [
+    "semgrep",
+    "bandit",
+    "trivy",
+    "osv-scanner",
+    "gitleaks",
+    "native_tests",
+    "final_regression"
+  ],
+  "patches_generated": [],
+  "regression_tests": [],
+  "coverage": {},
+  "limitations": [
+    "Application did not start; dynamic/browser/fuzz steps will be limited",
+    "Gitleaks unavailable or produced no output - used built-in regex secret scanner",
+    "No project-native test command detected",
+    "Dynamic testing skipped (disabled or app not running)",
+    "Browser testing skipped (disabled or app not running)",
+    "Security Agent: rate limited (429)",
+    "Root Cause Agent: rate limited (429)",
+    "Auto-repair skipped: application not running, cannot reproduce"
+  ],
+  "sandbox_mode": "local",
+  "attack_graph": [],
+  "ai": {
+    "calls": 1,
+    "cost_usd": 7.2e-05,
+    "tokens": {
+      "input": 202,
+      "output": 69
+    }
+  },
+  "generated_at": "2026-08-19T13:33:57.373722+00:00"
+}
